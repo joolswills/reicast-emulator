@@ -24,7 +24,6 @@ ASFLAGS :=
 LDFLAGS	:=	-g -Wl,-Map,$(notdir $@).map,--gc-sections -Wl,-O3 -Wl,--sort-common 
 
 
-
 CXXFLAGS := -g -O3  -D GLES -D RELEASE -c -D TARGET_GCW0 -D HOST_EMSCRIPTEN -D HOST_NO_REC -D HOST_NO_NVMEM -D HOST_NO_WEBUI -D HOST_NO_THREADS
 CXXFLAGS += -fno-strict-aliasing
 CXXFLAGS += -ffast-math
@@ -32,29 +31,9 @@ CXXFLAGS += -ffast-math
 CXXFLAGS += $(CFLAGS) $(MFLAGS) -fno-exceptions -fno-rtti
 
 
-ifdef PGO_MAKE
-	CXXFLAGS += -fprofile-generate -pg
-	LDFLAGS	+= -fprofile-generate
-else
-	CXXFLAGS += -fomit-frame-pointer
-endif
-
-ifdef PGO_USE
-	CXXFLAGS += -fprofile-use
-endif
-
-
-ifdef LTO_TEST
-	CXXFLAGS += -flto -fwhole-program 
-	LDFLAGS +=-flto -fwhole-program 
-endif
-
 INCS	:= -I$(RZDCY_SRC_DIR) -I$(RZDCY_SRC_DIR)/deps -I$(RZDCY_SRC_DIR)/khronos -I../linux-deps/include
 
-LIBS    := -L../linux-deps/lib -L./enta_viv 
-LIBS    += -lEGL -lGLESv2
-LIBS    += -lasound
-
+LIBS	:= #emscripten has all the basic libs, and egl, and sdl, built in
 
 OBJECTS=$(RZDCY_FILES:.cpp=.build.obj)
 OBJECTS:=$(OBJECTS:.c=.build.obj)
@@ -62,11 +41,7 @@ OBJECTS:=$(OBJECTS:.S=.build.obj)
 OBJECTS:=$(patsubst $(RZDCY_SRC_DIR)/%,obj/%,$(OBJECTS))
 
 
-PACKAGE=reicast-gcwz.opk
-EXECUTABLE_STRIPPED=nosym-reicast.elf
-EXECUTABLE_TARBZ=reicast.tar.bz2
 EXECUTABLE=reicast.html
-
 
 all: $(CPPFILES) $(EXECUTABLE)
 	
