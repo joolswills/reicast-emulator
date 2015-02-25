@@ -173,9 +173,12 @@ int dc_init(int argc,wchar* argv[])
 	int rv= 0;
 
 
-	if (!LoadRomFiles(GetPath("/data/")))
+	if (settings.bios.UseReios || !LoadRomFiles(GetPath("/data/")))
 	{
-		return -3;
+		if (!LoadHle(GetPath("/data/")))
+			return -3;
+		else
+			msgboxf("Could not find bios files, using reios\nThis will break many games.",MBX_ICONWARNING);
 	}
 
 #if !defined(HOST_NO_REC)
@@ -260,6 +263,10 @@ void LoadSettings()
 	
 	settings.pvr.ta_skip			= cfgLoadInt("config","ta.skip",0);
 	settings.pvr.rend				= cfgLoadInt("config","pvr.rend",0);
+
+	settings.debug.SerialConsole = cfgLoadInt("config", "Debug.SerialConsoleEnabled", 0) != 0;
+
+	settings.bios.UseReios = cfgLoadInt("config", "bios.UseReios", 0);
 #endif
 
 #if (HOST_OS != OS_LINUX || defined(_ANDROID) || defined(TARGET_PANDORA))
